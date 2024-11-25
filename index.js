@@ -7,6 +7,21 @@ const require = module.createRequire(import.meta.url)
 export default class PathResolver
 {
   /**
+   * @type {string|undefined}
+   */
+  #basePath = path.dirname(process.argv[1])
+
+  set basePath(value)
+  {
+    this.#basePath = value
+  }
+
+  get basePath()
+  {
+    return this.#basePath
+  }
+
+  /**
    * @param {string}    providedPath 
    * @param {function}  resolveFile callback
    * @param {function}  resolveDirectory callback
@@ -15,9 +30,11 @@ export default class PathResolver
   {
     try
     {
-      if(path.isAbsolute(providedPath))
+      const normalizedPath = this.#normalizePath(providedPath)
+
+      if(path.isAbsolute(normalizedPath))
       {
-        return await this.#resolveProvidedPath(providedPath, resolveFile, resolveDirectory)
+        return await this.#resolveProvidedPath(normalizedPath, resolveFile, resolveDirectory)
       }
       else
       {
@@ -32,6 +49,30 @@ export default class PathResolver
       error.cause = reason
       throw error
     }
+  }
+
+  #normalizePath(providedPath)
+  {
+    if('string' !== typeof providedPath)
+    {
+      const error = new TypeError('Provided path must be a string')
+      error.code  = 'E_RESOLVE_PATH_INVALID_PROVIDED_PATH_TYPE'
+      error.cause = new TypeError(`Invalid provided path type "${Object.prototype.toString.call(providedPath)}"`)
+      throw error
+    }
+
+    if('string' === typeof this.basePath)
+    {
+      if(providedPath[0] === '.'
+      &&(providedPath[1] === path.sep
+      ||(providedPath[1] === '.'
+      && providedPath[2] === path.sep)))
+      {
+        providedPath = path.join(this.basePath, providedPath)
+      }
+    }
+
+    return providedPath
   }
 
   async #resolveProvidedPath(providedPath, resolveFile, resolveDirectory)

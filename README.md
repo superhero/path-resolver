@@ -1,5 +1,5 @@
 
-# README: Path Resolver
+# Path Resolver
 
 A utility for callbacks to resolved file paths, directories, symbolic links, and Node.js modules, ensuring a consistent path resolution.
 
@@ -37,7 +37,7 @@ const pathResolver = new PathResolver()
 const resolveFile      = async (filePath) => `Resolved file: ${filePath}`
 const resolveDirectory = async (dirPath)  => `Resolved directory: ${dirPath}`
 
-const result = await pathResolver.resolve('/absolute/path/to/mock/file.js', resolveFile, resolveDirectory)
+const result = await pathResolver.resolve('./mock/file.js', resolveFile, resolveDirectory)
 console.log(result) // Outputs: Resolved file: /absolute/path/to/mock/file.js
 ```
 
@@ -68,32 +68,32 @@ console.log(result) // Outputs: Resolved file: /absolute/path/to/mock/file.js
 
 #### Resolving File Paths
 ```javascript
-const result = await pathResolver.resolve('/absolute/path/to/file.json', resolveFile, resolveDirectory)
+const result = await pathResolver.resolve('./file.json', resolveFile, resolveDirectory)
 console.log(result) // Resolved file: /absolute/path/to/file.json
 ```
 
 #### Resolving Directory Paths
 ```javascript
-const result = await pathResolver.resolve('/absolute/path/to/directory', resolveFile, resolveDirectory)
+const result = await pathResolver.resolve('./directory', resolveFile, resolveDirectory)
 console.log(result) // Resolved directory: /absolute/path/to/directory
 ```
 
 #### Handling Symbolic Links
 ```javascript
-const result = await pathResolver.resolve('/absolute/path/to/symlink', resolveFile, resolveDirectory)
+const result = await pathResolver.resolve('./symlink', resolveFile, resolveDirectory)
 console.log(result) // Resolved directory: /absolute/path/to/real-target
 ```
 
 #### Resolving Node.js Core Modules
 ```javascript
 const result = await pathResolver.resolve('node:fs', resolveFile, resolveDirectory)
-console.log(result) // Resolved file: /path/to/core/module/fs.js
+console.log(result) // Resolved file: /absolute/path/to/core/module/fs.js
 ```
 
 #### Resolving Scoped Packages
 ```javascript
 const result = await pathResolver.resolve('@superhero/path-resolver', resolveFile, resolveDirectory)
-console.log(result) // Resolved file: /path/to/node_modules/@superhero/path-resolver/index.js
+console.log(result) // Resolved file: /absolute/path/to/node_modules/@superhero/path-resolver/index.js
 ```
 
 #### Handling Invalid Paths
@@ -112,7 +112,7 @@ catch(error)
 
 ### Tests
 
-This module includes a comprehensive test suite. To run the tests:
+This module includes a test suite. To run the tests:
 
 ```bash
 npm test
@@ -122,26 +122,30 @@ npm test
 
 ```
 ▶ @superhero/path-resolver
-  ✔ Resolves file paths correctly (4.078047ms)
-  ✔ Resolves directory paths correctly (1.574091ms)
-  ✔ Handles symbolic links correctly (2.651328ms)
-  ✔ Throws error for invalid symbolic link (2.947988ms)
-  ✔ Throws error for invalid path (3.607256ms)
-  ✔ Resolves paths to Node.js core modules (0.992362ms)
-  ✔ Resolves paths to "@superhero/path-resolver" module (1.871912ms)
-  ✔ Throws error for non-existent module (0.970715ms)
-✔ @superhero/path-resolver (38.619711ms)
+  ✔ Resolves file paths correctly (4.152623ms)
+  ✔ Resolves directory paths correctly (1.573636ms)
+  ✔ Handles symbolic links correctly (1.284275ms)
+  ✔ Throws error for invalid symbolic link (1.924598ms)
+  ✔ Throws error for invalid path (2.207014ms)
+  ✔ Resolves paths to Node.js core modules (0.488862ms)
+  ✔ Resolves paths to "@superhero/path-resolver" module (1.268896ms)
+  ✔ Throws error for non-existent module (0.805901ms)
+  ✔ Can use relative paths relative to the main directory (1.407842ms)
+  ✔ Can alter basePath to determine the root to a relative path (0.668805ms)
+  ✔ Can use parent directory in a relative path (0.571907ms)
+  ✔ Throws error if not using a string as provided path to resolve (0.266317ms)
+✔ @superhero/path-resolver (30.570623ms)
 
-tests 8
-pass 8
+tests 12
+pass 12
 
 ----------------------------------------------------------------
 file            | line % | branch % | funcs % | uncovered lines
 ----------------------------------------------------------------
-index.js        |  93.44 |    92.31 |  100.00 | 56-59
-index.test.js   | 100.00 |   100.00 |   95.65 | 
+index.js        |  96.08 |    95.65 |  100.00 | 97-100
+index.test.js   | 100.00 |   100.00 |   96.97 | 
 ----------------------------------------------------------------
-all files       |  97.74 |    97.22 |   96.00 | 
+all files       |  98.49 |    98.21 |   97.44 | 
 ----------------------------------------------------------------
 ```
 

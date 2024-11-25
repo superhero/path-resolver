@@ -2,13 +2,14 @@ import assert       from 'assert'
 import PathResolver from '@superhero/path-resolver'
 import fs           from 'node:fs/promises'
 import path         from 'node:path'
-import { before, after, suite, test } from 'node:test'
+import url          from 'node:url'
+import { before, beforeEach, after, suite, test } from 'node:test'
 
 suite('@superhero/path-resolver', () =>
 {
   const 
     noop                = () => null,
-    mockDir             = './mock',
+    mockDir             = './test',
     mockFile            = `${mockDir}/mock-file`,
     mockSubDir          = `${mockDir}/mock-sub-dir`,
     mockSymlink         = `${mockDir}/mock-symlink`,
@@ -28,6 +29,10 @@ suite('@superhero/path-resolver', () =>
     await fs.symlink('mock-sub-dir', mockSymlink)
     await fs.symlink('non-existent-target', mockInvalidSymlink)
 
+  })
+
+  beforeEach(() =>
+  {
     pathResolver = new PathResolver()
     assert.ok(pathResolver instanceof PathResolver, 'Should initialize PathResolver correctly')
   })
@@ -112,5 +117,47 @@ suite('@superhero/path-resolver', () =>
       async () => pathResolver.resolve('non-existent-module', noop, noop),
       (error) => error.code === 'E_RESOLVE_PATH' && error.cause.code === 'MODULE_NOT_FOUND',
       'Should throw error for non-existent module')
+  })
+
+  test('Can use relative paths relative to the main directory', async () =>
+  {
+    const
+      resolveFile       = async (filePath) => filePath,
+      result            = await pathResolver.resolve(mockFile, resolveFile, noop),
+      absoluteFilePath  = path.resolve(mockFile)
+
+    assert.strictEqual(result, absoluteFilePath, 'Should resolve file path correctly')
+  })
+
+  test('Can alter basePath to determine the root to a relative path', async () =>
+  {
+    pathResolver.basePath = path.join(pathResolver.basePath, mockDir)
+
+    const
+      resolveFile       = async (filePath) => filePath,
+      absoluteFilePath  = path.resolve(mockFile),
+      result            = await pathResolver.resolve('./mock-file', resolveFile, noop)
+
+    assert.strictEqual(result, absoluteFilePath, 'Should resolve file path correctly')
+  })
+
+  test('Can use parent directory in a relative path', async () =>
+  {
+    pathResolver.basePath = path.join(pathResolver.basePath, mockDir, './sub-dir')
+
+    const
+      resolveFile       = async (filePath) => filePath,
+      absoluteFilePath  = path.resolve(mockFile),
+      result            = await pathResolver.resolve('../mock-file', resolveFile, noop)
+
+    assert.strictEqual(result, absoluteFilePath, 'Should resolve file path correctly')
+  })
+
+  test('Throws error if not using a string as provided path to resolve', async () =>
+  {
+    await assert.rejects(
+      async () => pathResolver.resolve(null, noop, noop),
+      (error) => error.code === 'E_RESOLVE_PATH' && error.cause.code === 'E_RESOLVE_PATH_INVALID_PROVIDED_PATH_TYPE',
+      'Should throw error for invalid provided path type')
   })
 })
