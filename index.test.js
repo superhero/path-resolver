@@ -2,7 +2,6 @@ import assert       from 'assert'
 import PathResolver from '@superhero/path-resolver'
 import fs           from 'node:fs/promises'
 import path         from 'node:path'
-import url          from 'node:url'
 import { before, beforeEach, after, suite, test } from 'node:test'
 
 suite('@superhero/path-resolver', () =>
@@ -28,7 +27,6 @@ suite('@superhero/path-resolver', () =>
     // Create mocked symbolic link
     await fs.symlink('mock-sub-dir', mockSymlink)
     await fs.symlink('non-existent-target', mockInvalidSymlink)
-
   })
 
   beforeEach(() =>

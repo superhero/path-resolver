@@ -1,6 +1,6 @@
 {
   "name": "@superhero/path-resolver",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Resolve paths to direcories or files with custom file and directory callbacks.",
   "main": "index.js",
   "license": "MIT",

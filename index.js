@@ -36,11 +36,30 @@ export default class PathResolver
       {
         return await this.#resolveProvidedPath(normalizedPath, resolveFile, resolveDirectory)
       }
-      else
+
+      if(providedPath === process.env.npm_package_name
+      && process.env.npm_package_json)
       {
-        const resolvedFilePath = require.resolve(providedPath)
-        return await resolveFile(resolvedFilePath)
+        const 
+          packageJsonBuffer = await fs.readFile(process.env.npm_package_json),
+          packageJson       = JSON.parse(packageJsonBuffer.toString()),
+          packageDirname    = path.dirname(process.env.npm_package_json)
+
+        if(packageJson.main)
+        {
+          return await resolveFile(path.join(packageDirname, packageJson.main))
+        }
+
+        if(packageJson.exports?.['.'])
+        {
+          return await resolveFile(path.join(packageDirname, packageJson.exports['.']))
+        }
+
+        return await resolveDirectory(packageDirname)
       }
+
+      const resolvedFilePath = require.resolve(providedPath)
+      return await resolveFile(resolvedFilePath)
     }
     catch(reason)
     {
