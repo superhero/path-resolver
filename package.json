@@ -1,6 +1,6 @@
 {
   "name": "@superhero/path-resolver",
-  "version": "4.0.2",
+  "version": "4.7.0",
   "description": "Resolve paths to direcories or files with custom file and directory callbacks.",
   "main": "index.js",
   "license": "MIT",
@@ -9,7 +9,13 @@
     ".": "./index.js"
   },
   "scripts": {
-    "test": "node --trace-warnings --test --experimental-test-coverage"
+    "syntax-check": "syntax-check",
+    "test": "syntax-check; node --test --test-reporter=@superhero/audit/reporter --experimental-test-coverage"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@superhero/audit": "4.7.0",
+    "@superhero/syntax-check": "0.0.2"
   },
   "author": {
     "name": "Erik Landvall",
