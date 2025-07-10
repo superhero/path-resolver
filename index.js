@@ -1,6 +1,7 @@
 import fs     from 'node:fs/promises'
 import module from 'node:module'
 import path   from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 export default class PathResolver
 {
@@ -35,25 +36,42 @@ export default class PathResolver
         return await this.#resolveProvidedPath(normalizedPath, resolveFile, resolveDirectory)
       }
 
-      if(providedPath === process.env.npm_package_name
-      && process.env.npm_package_json)
+      if(process.env.npm_package_json
+      && process.env.npm_package_name
+      && providedPath.startsWith(process.env.npm_package_name))
       {
         const 
           packageJsonBuffer = await fs.readFile(process.env.npm_package_json),
           packageJson       = JSON.parse(packageJsonBuffer.toString()),
-          packageDirname    = path.dirname(process.env.npm_package_json)
+          packageDirname    = path.dirname(process.env.npm_package_json),
+          map               = { ...packageJson.imports, ...packageJson.exports }
 
-        if(packageJson.main)
+        for(let key in map)
         {
-          return await resolveFile(path.join(packageDirname, packageJson.main))
-        }
+          let 
+            matchWith = process.env.npm_package_name,
+            matchPath = path.join(packageDirname, map[key])
 
-        if(packageJson.exports?.['.'])
-        {
-          return await resolveFile(path.join(packageDirname, packageJson.exports['.']))
-        }
+          if(key.length > 1)
+          {
+            matchWith += key.slice(1)
+          }
 
-        return await resolveDirectory(packageDirname)
+          if(matchWith === providedPath)
+          {
+            return await resolveFile(matchPath)
+          }
+
+          const 
+            regex = new RegExp('^' + matchWith.replace(/\*/, '([^/]+)') + '$'),
+            match = providedPath.match(regex)
+
+          if(match && match[1] && 'string' === typeof matchPath)
+          {
+            matchPath = matchPath.replace(/\*/, match[1])
+            return await resolveFile(matchPath)
+          }
+        }
       }
 
       if(import.meta?.resolve)
