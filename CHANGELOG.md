@@ -1,4 +1,10 @@
 ---
+#### v4.7.10
+---
+
+Can resolve an exported entrypoint.
+
+---
 #### v4.7.9
 ---
 
