@@ -113,8 +113,16 @@ suite('@superhero/path-resolver', () =>
   {
     await assert.rejects(
       async () => pathResolver.resolve('non-existent-module', noop, noop),
-      (error) => error.code === 'E_RESOLVE_PATH' && error.cause.code === 'MODULE_NOT_FOUND',
+      (error) => error.code === 'E_RESOLVE_PATH' && (error.cause.code === 'MODULE_NOT_FOUND' 
+                                                 ||  error.cause.code === 'ERR_MODULE_NOT_FOUND'),
       'Should throw error for non-existent module')
+  })
+
+  test('Can resolve an exported entrypoint', async () =>
+  {
+    await assert.doesNotReject(
+      async () => pathResolver.resolve('@superhero/path-resolver/_test', noop, noop),
+      'Should be able to resolve exported @superhero/path-resolver/_test entrypoint')
   })
 
   test('Can use relative paths relative to the main directory', async () =>

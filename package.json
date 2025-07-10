@@ -5,8 +5,12 @@
   "main": "index.js",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "exports": {
-    ".": "./index.js"
+    ".": "./index.js",
+    "./_test": "./_test.json"
   },
   "scripts": {
     "syntax-check": "syntax-check",

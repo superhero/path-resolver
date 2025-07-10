@@ -2,8 +2,6 @@ import fs     from 'node:fs/promises'
 import module from 'node:module'
 import path   from 'node:path'
 
-const require = module.createRequire(import.meta.url)
-
 export default class PathResolver
 {
   /**
@@ -58,8 +56,18 @@ export default class PathResolver
         return await resolveDirectory(packageDirname)
       }
 
-      const resolvedFilePath = require.resolve(providedPath)
-      return await resolveFile(resolvedFilePath)
+      if(import.meta?.resolve)
+      {
+        const fileUrl = import.meta.resolve(providedPath, this.basePath)
+        const resolvedFilePath = new URL(fileUrl).pathname
+        return await resolveFile(resolvedFilePath)
+      }
+      else
+      {
+        const require = module.createRequire(this.basePath)
+        const resolvedFilePath = require.resolve(providedPath)
+        return await resolveFile(resolvedFilePath)
+      }
     }
     catch(reason)
     {
