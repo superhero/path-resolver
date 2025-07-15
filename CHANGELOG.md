@@ -1,4 +1,10 @@
 ---
+#### v4.7.11
+---
+
+Improved on the ability resolve exported entrypoints.
+
+---
 #### v4.7.10
 ---
 
