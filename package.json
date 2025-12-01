@@ -1,6 +1,6 @@
 {
   "name": "@superhero/path-resolver",
-  "version": "4.7.18",
+  "version": "4.7.19",
   "description": "Resolve paths to direcories or files with custom file and directory callbacks.",
   "main": "index.js",
   "license": "MIT",
@@ -18,7 +18,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@superhero/audit": "4.7.18",
+    "@superhero/audit": "4.7.19",
     "@superhero/syntax-check": "0.0.2"
   },
   "author": {
